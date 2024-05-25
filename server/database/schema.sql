@@ -1,4 +1,3 @@
-drop table if exists user, item, program, category;
 
 create table user (
   id int unsigned primary key auto_increment not null,
