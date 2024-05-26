@@ -28,6 +28,7 @@ class AbstractSeeder {
     this.promises = [];
 
     this.faker = faker;
+    
     this.refs = refs;
   }
 
