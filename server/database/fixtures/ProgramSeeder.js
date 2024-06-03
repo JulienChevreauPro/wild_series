@@ -32,7 +32,12 @@ class ProgramSeeder extends AbstractSeeder {
     ];
 
     programs.forEach((program) => {
-      this.insert(program); // insert into program(title, synopsis, poster, country, year, category_id) values (?, ?, ?, ?, ?, ?)
+      const programWithRefName = {
+        ...program,
+        refName: `program_${program.title}`,
+      };
+
+      this.insert(programWithRefName); // insert into program(title, synopsis, poster, country, year, category_id) values (?, ?, ?, ?, ?, ?)
     });
   }
 }

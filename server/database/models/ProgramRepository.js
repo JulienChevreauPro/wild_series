@@ -44,16 +44,30 @@ class ProgramRepository extends AbstractRepository {
   // The U of CRUD - Update operation
   // TODO: Implement the update operation to modify an existing program
 
-  // async update(program) {
-  //   ...
-  // }
+  async update(program) {
+    // Execute the SQL UPDATE query to update a specific program
+    const [result] = await this.database.query(
+      `update ${this.table} set name = ? where id = ?`,
+      [program.title, program.id]
+    );
+  
+    // Return how many rows were affected
+    return result.affectedRows;
+  }
 
   // The D of CRUD - Delete operation
   // TODO: Implement the delete operation to remove an program by its ID
 
-  // async delete(id) {
-  //   ...
-  // }
+  async delete(id) {
+    // Execute the SQL DELETE query to delete a specific program
+    const [result] = await this.database.query(
+      `delete from ${this.table} where id = ?`,
+      [id]
+    );
+  
+    // Return how many rows were affected
+    return result.affectedRows;
+  }
 }
 
 module.exports = ProgramRepository;

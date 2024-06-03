@@ -25,8 +25,16 @@ class CategoryRepository extends AbstractRepository {
   async read(id) {
     // Execute the SQL SELECT query to retrieve a specific category by its ID
     const [rows] = await this.database.query(
-      `select * from ${this.table} where id = ?`,
-      [id]
+      `select category.*, JSON_ARRAYAGG(
+        JSON_OBJECT(
+          "id", program.id,
+          "title", program.title
+        )
+      ) as programs from ${this.table}
+      left join program on program.category_id = category.id
+      where category.id = ?
+      group by category.id`,
+    [id]
     );
 
     // Return the first row of the result, which represents the category
@@ -44,16 +52,30 @@ class CategoryRepository extends AbstractRepository {
   // The U of CRUD - Update operation
   // TODO: Implement the update operation to modify an existing category
 
-  // async update(category) {
-  //   ...
-  // }
+  async update(category) {
+    // Execute the SQL UPDATE query to update a specific category
+    const [result] = await this.database.query(
+      `update ${this.table} set name = ? where id = ?`,
+      [category.name, category.id]
+    );
+  
+    // Return how many rows were affected
+    return result.affectedRows;
+  }
 
   // The D of CRUD - Delete operation
   // TODO: Implement the delete operation to remove an category by its ID
 
-  // async delete(id) {
-  //   ...
-  // }
+  async delete(id) {
+    // Execute the SQL DELETE query to delete a specific category
+    const [result] = await this.database.query(
+      `delete from ${this.table} where id = ?`,
+      [id]
+    );
+  
+    // Return how many rows were affected
+    return result.affectedRows;
+  }
 }
 
 module.exports = CategoryRepository;

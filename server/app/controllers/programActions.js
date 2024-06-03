@@ -27,10 +27,13 @@ const tables = require("../../database/tables");
 
 // Declare the action
 
-const browse = async (req, res) => {
-  const programsFromDB = await tables.program.readAll();
-
-  res.json(programsFromDB);
+const browse = async (req, res, next) => {
+  try {
+    const programsFromDB = await tables.program.readAll();
+    res.status(200).json(programsFromDB);
+  } catch (err) {
+    next(err);
+  }
 };
 
 // const browse = (req, res) => {
@@ -47,18 +50,67 @@ const browse = async (req, res) => {
 
 // *****************************************************
 
-const read = (req, res) => {
-  const parsedId = parseInt(req.params.id, 10);
+const read = (req, res, next) => {
+  try {
+    const parsedId = parseInt(req.params.id, 10);
 
-  const program = tables.program.find((p) => p.id === parsedId);
+    const program = tables.program.read(parsedId);
 
-  if (program != null) {
-    res.json(program);
-  } else {
-    res.sendStatus(404);
+    if (program != null) {
+      res.status(200).json(program);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+const edit = async (req, res, next) => {
+  // Extract the program data from the request body and params
+  const program = { ...req.body, id: req.params.id };
+
+  try {
+    // Update the program in the database
+    await tables.program.update(program);
+
+    // Respond with HTTP 204 (No Content)
+    res.sendStatus(204);
+  } catch (err) {
+    // Pass any errors to the error-handling middleware
+    next(err);
+  }
+};
+
+const add = async (req, res, next) => {
+  // Extract the program data from the request body
+  const program = req.body;
+
+  try {
+    // Insert the program into the database
+    const insertId = await tables.program.create(program);
+
+    // Respond with HTTP 201 (Created) and the ID of the newly inserted program
+    res.status(201).json({ insertId });
+  } catch (err) {
+    // Pass any errors to the error-handling middleware
+    next(err);
+  }
+};
+
+const destroy = async (req, res, next) => {
+  try {
+    // Delete the program from the database
+    await tables.program.delete(req.params.id);
+
+    // Respond with HTTP 204 (No Content)
+    res.sendStatus(204);
+  } catch (err) {
+    // Pass any errors to the error-handling middleware
+    next(err);
   }
 };
 
 // Export it to import it somewhere else
 
-module.exports = { browse, read };
+module.exports = { browse, read, edit, add, destroy };
